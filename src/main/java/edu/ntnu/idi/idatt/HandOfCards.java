@@ -21,4 +21,31 @@ public class HandOfCards {
     }
     return sum;
   }
+
+  public String getHeartsAsString() {
+    var hearts = cards.stream()
+        .filter(c -> c.getSuit() == 'H')
+        .toList();
+
+    if (hearts.isEmpty()) {
+      return "No Hearts";
+    }
+    return hearts.stream()
+        .map(PlayingCard::getAsString)
+        .reduce((a, b) -> a + " " + b)
+        .orElse("No Hearts");
+  }
+
+  public boolean hasQueenOfSpades() {
+    return cards.stream()
+        .anyMatch(c -> c.getSuit() == 'S' && c.getFace() == 12);
+  }
+
+  public boolean isFlush() {
+    if (cards.size() < 5) {
+      return false;
+    }
+    char suit = cards.get(0).getSuit();
+    return cards.stream().allMatch(c -> c.getSuit() == suit);
+  }
 }
