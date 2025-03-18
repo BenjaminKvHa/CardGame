@@ -7,7 +7,12 @@ import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
+import java.util.List;
+
 public class Main extends Application {
+
+  private DeckOfCards deckOfCards;
+  private List<PlayingCard> currentHand;
 
   private TextArea textAreaHand;
   private Button buttonDeal;
@@ -19,11 +24,16 @@ public class Main extends Application {
 
   @Override
   public void start(Stage primaryStage) {
+    deckOfCards = new DeckOfCards();
+
     textAreaHand = new TextArea("Display the hand of cards here");
     textAreaHand.setEditable(false);
 
     buttonDeal = new Button("Deal hand");
+    buttonDeal.setOnAction(e -> dealHand());
+
     buttonCheck = new Button("Check hand");
+    buttonCheck.setOnAction(e -> checkHand());
 
     textFieldSum = new TextField();
     textFieldSum.setEditable(false);
@@ -58,6 +68,42 @@ public class Main extends Application {
     primaryStage.setScene(scene);
     primaryStage.setTitle("Card Game");
     primaryStage.show();
+  }
+
+  private void dealHand() {
+    if (deckOfCards.getDeck().size() < 5) {
+      deckOfCards = new DeckOfCards();
+    }
+    currentHand = deckOfCards.dealHand(5);
+
+    StringBuilder sb = new StringBuilder();
+    for (PlayingCard card : currentHand) {
+      sb.append(card.getAsString()).append(" ");
+    }
+    textAreaHand.setText(sb.toString().trim());
+
+    textFieldSum.clear();
+    textFieldHearts.clear();
+    textFieldQueen.clear();
+    textFieldFlush.clear();
+  }
+
+  private void checkHand() {
+    if (currentHand == null || currentHand.isEmpty()) {
+      textFieldSum.setText("No hand dealt");
+      return;
+    }
+    HandOfCards handOfCards = new HandOfCards(currentHand);
+
+    textFieldSum.setText(String.valueOf(handOfCards.getSumOfFaces()));
+
+    textFieldHearts.setText(handOfCards.getHeartsAsString());
+
+    boolean hasQueen = handOfCards.hasQueenOfSpades();
+    textFieldQueen.setText(hasQueen ? "Yes" : "No");
+
+    boolean flush = handOfCards.isFlush();
+    textFieldFlush.setText(flush ? "Yes" : "No");
   }
 
   public static void main(String[] args) {
